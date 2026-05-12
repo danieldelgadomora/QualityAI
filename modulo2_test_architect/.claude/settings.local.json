@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"import json; d=json.load\\(open\\(r'c:\\\\Users\\\\daald\\\\Documents\\\\Especialización en construcción de software\\\\segundo semestre\\\\Automatización de pruebas\\\\proyectos\\\\QualityAI\\\\modulo2_test_architect\\\\output\\\\contract_b_v3_20260509_122056_reviewed.json', encoding='utf-8'\\)\\); print\\(json.dumps\\({k:v for k,v in d.items\\(\\) if k not in ['features','coverage_matrix']}, indent=2, ensure_ascii=False\\)\\)\")",
+      "Read(//c/Users/daald/Documents/Especialización en construcción de software/segundo semestre/Automatización de pruebas/proyectos/QualityAI/**)",
+      "Bash(python modulo2_test_architect/generate_acta.py \"modulo2_test_architect/output/contract_b_v3_20260509_122056_reviewed.json\")",
+      "Bash(python -c ' *)"
+    ]
+  }
+}
