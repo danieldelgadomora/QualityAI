@@ -2,13 +2,14 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.dependencies import init_agent
-from app.routers import health, hitl, requirements
+from app.dependencies import init_agent, init_m2_kb
+from app.routers import health, hitl, pipeline_ws, requirements
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     init_agent()
+    init_m2_kb()
     yield
 
 
@@ -30,3 +31,4 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(requirements.router, prefix="/api/v1")
 app.include_router(hitl.router, prefix="/api/v1")
+app.include_router(pipeline_ws.router, prefix="/api/v1")

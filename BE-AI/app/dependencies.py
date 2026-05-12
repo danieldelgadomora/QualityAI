@@ -1,6 +1,7 @@
 import os
 import sys
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 from typing import Optional
 
 from app.config import settings
@@ -22,6 +23,9 @@ _agent_v3: Optional[_AgentV3] = None
 _agent_v2: Optional[_AgentV2] = None
 _agent_v4: Optional[_AgentV4] = None
 _executor: Optional[ThreadPoolExecutor] = None
+
+_m2_modelo = None
+_m2_collection = None
 
 
 def init_agent() -> None:
@@ -68,3 +72,21 @@ def get_executor() -> ThreadPoolExecutor:
 
 def is_agent_ready() -> bool:
     return _agent_v3 is not None
+
+
+def init_m2_kb() -> None:
+    """Inicializa la KB de patrones Katary (M2) una vez al arranque."""
+    global _m2_modelo, _m2_collection
+    _qualityai_root = Path(__file__).resolve().parents[2]
+    if str(_qualityai_root) not in sys.path:
+        sys.path.insert(0, str(_qualityai_root))
+    from modulo2_test_architect.pipeline_auto import inicializar_kb  # noqa: E402
+    print("⏳ Inicializando KB de patrones M2 (Katary)...")
+    _m2_modelo, _m2_collection = inicializar_kb()
+    print("✅ KB M2 lista")
+
+
+def get_m2_kb() -> tuple:
+    if _m2_modelo is None or _m2_collection is None:
+        raise RuntimeError("KB M2 no inicializada")
+    return _m2_modelo, _m2_collection

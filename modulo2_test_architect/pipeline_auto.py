@@ -317,7 +317,7 @@ def construir_prompt(ac: AcceptanceCriterion, story: UserStory, patrones: list[d
 # ============================================================
 def generar_con_groq(client: Groq, system_prompt: str, user_message: str) -> str:
     response = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="qwen/qwen3-32b",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},

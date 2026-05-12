@@ -10,6 +10,6 @@ def health_check():
     return {
         "status": "ok",
         "agent_ready": is_agent_ready(),
-        "model": "llama-3.3-70b-versatile",
+        "model": "qwen/qwen3-32b",
         "max_concurrent_jobs": settings.max_concurrent_jobs,
     }

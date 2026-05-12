@@ -2,7 +2,7 @@ from pathlib import Path
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 _BASE_DIR = Path(__file__).parent.parent        # BE-AI/
-_AGENT_DIR = _BASE_DIR.parent / "qualityai-modulo1"
+_AGENT_DIR = _BASE_DIR.parent / "modulo1_requirements_refiner"
 
 # Priority: BE-AI/.env > qualityai-modulo1/.env
 _local_env = _BASE_DIR / ".env"

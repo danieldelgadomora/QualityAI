@@ -165,7 +165,7 @@ def generar_con_groq(system_prompt, user_message):
     client = Groq(api_key=GROQ_API_KEY)
 
     respuesta = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="qwen/qwen3-32b",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
@@ -188,7 +188,7 @@ def generar_sin_rag(requerimiento):
     client = Groq(api_key=GROQ_API_KEY)
 
     respuesta = client.chat.completions.create(
-        model="llama-3.1-8b-instant",
+        model="qwen/qwen3-32b",
         messages=[
             {"role": "system", "content": "Eres un Analista de Requerimientos. Responde en español."},
             {"role": "user", "content": f"""Transforma este requerimiento en historias de usuario

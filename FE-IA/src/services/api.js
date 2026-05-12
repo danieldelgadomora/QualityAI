@@ -1,5 +1,8 @@
 const BASE = '/api/v1'
 
+const WS_PROTO = window.location.protocol === 'https:' ? 'wss' : 'ws'
+export const WS_PIPELINE_URL = `${WS_PROTO}://${window.location.host}/api/v1/pipeline/ws`
+
 async function request(url, body) {
   const res = await fetch(url, {
     method: 'POST',

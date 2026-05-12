@@ -119,7 +119,7 @@ class RequirementsRefinerAgent:
     def __init__(
         self,
         groq_api_key: str,
-        model_name: str = "llama-3.1-8b-instant",
+        model_name: str = "qwen/qwen3-32b",
         embedding_model: str = "all-MiniLM-L6-v2",
         kb_path: str = None,
         stories_path: str = None,

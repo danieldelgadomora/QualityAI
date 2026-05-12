@@ -170,7 +170,7 @@ def generar_con_groq(system_prompt, user_message):
     client = Groq(api_key=GROQ_API_KEY)
 
     respuesta = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="qwen/qwen3-32b",
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},

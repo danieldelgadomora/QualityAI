@@ -31,6 +31,14 @@ const AGENTS = [
     badgeColor: 'bg-purple-100 text-purple-700',
     icon: '🧑‍💻',
   },
+  {
+    value: '5',
+    label: 'Agente 5 — Pipeline M1+M2 Completo',
+    desc: 'Pipeline interactivo completo: refinamiento HITL (M1) + generación de escenarios Gherkin con ISO 25010 + revisión analista (M2) + Acta de Aprobación HTML.',
+    badge: 'Full',
+    badgeColor: 'bg-emerald-100 text-emerald-700',
+    icon: '🔬',
+  },
 ]
 
 export default function RequirementForm({
@@ -104,6 +112,16 @@ export default function RequirementForm({
               <span className="text-base shrink-0 leading-none mt-0.5">🧑‍💻</span>
               <span>
                 El Agente 4 detectará ambigüedades en tu requerimiento y te pedirá que las resuelvas manualmente antes de generar el resultado final.
+              </span>
+            </div>
+          )}
+
+          {/* Pipeline M1+M2 info */}
+          {agent === '5' && (
+            <div className="flex items-start gap-2.5 bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-xs text-emerald-700 mt-2">
+              <span className="text-base shrink-0 leading-none mt-0.5">🔬</span>
+              <span>
+                El Agente 5 ejecuta el pipeline completo en tiempo real vía WebSocket: resolverás ambigüedades (M1), revisarás cada escenario Gherkin y aprobarás el suite (M2). Al finalizar se genera el Acta de Aprobación HTML.
               </span>
             </div>
           )}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import RequirementForm from './components/RequirementForm'
 import HITLReview from './components/HITLReview'
 import ResultView from './components/ResultView'
+import PipelineView from './components/PipelineView'
 import { analyzeWithAgent, hitlStart, hitlResolve } from './services/api'
 
 const LOADING_MESSAGES = {
@@ -11,7 +12,7 @@ const LOADING_MESSAGES = {
 }
 
 export default function App() {
-  const [phase, setPhase] = useState('form') // form | loading | hitl | result | error
+  const [phase, setPhase] = useState('form') // form | loading | hitl | result | error | pipeline
   const [loadingMsg, setLoadingMsg] = useState('')
   const [agent, setAgent] = useState('3')
   const [requirement, setRequirement] = useState('')
@@ -25,6 +26,11 @@ export default function App() {
     setError('')
 
     try {
+      if (agent === '5') {
+        setPhase('pipeline')
+        return
+      }
+
       if (agent === '4') {
         setLoadingMsg(LOADING_MESSAGES.hitl_start)
         setPhase('loading')
@@ -104,6 +110,7 @@ export default function App() {
             {phase === 'loading' && <span className="text-indigo-500">{loadingMsg}</span>}
             {phase === 'hitl' && <span className="text-amber-600 font-medium">Revisión de ambigüedades</span>}
             {phase === 'result' && <span className="text-green-600 font-medium">Resultado generado</span>}
+            {phase === 'pipeline' && <span className="text-emerald-600 font-medium">Pipeline M1+M2 interactivo</span>}
             {phase === 'error' && <span className="text-red-500">Error</span>}
           </div>
         </div>
@@ -145,6 +152,15 @@ export default function App() {
 
         {phase === 'result' && result && (
           <ResultView result={result} onBack={reset} />
+        )}
+
+        {phase === 'pipeline' && (
+          <PipelineView
+            requirement={requirement}
+            topK={topK}
+            interactiveM1={true}
+            onBack={reset}
+          />
         )}
 
         {phase === 'error' && (
