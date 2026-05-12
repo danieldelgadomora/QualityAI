@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/david/OneDrive/Documents/Especializacion/Automatizacion de pruebas/**)",
+      "Bash(npm install *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\david\\OneDrive\\Documents\\Especializacion\\Automatizacion de pruebas\\proyectoBase\\FE-IA"
+    ]
+  }
+}
