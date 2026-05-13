@@ -235,11 +235,12 @@ def _css() -> str:
         color: #fff;
         font-size: 9pt;
         font-weight: 700;
-        border-radius: 50%;
-        width: 20px;
+        border-radius: 20px;
+        min-width: 20px;
         height: 20px;
         text-align: center;
         line-height: 20px;
+        padding: 0 5px;
         margin-right: 8px;
       }
 
@@ -456,9 +457,147 @@ def _info_row(label: str, value: str) -> str:
 
 
 # ============================================================
+# SECCIÓN REQUERIMIENTO Y ANÁLISIS
+# ============================================================
+def _section_req_analisis(contract_a) -> str:
+    """Genera el cuerpo HTML de la sección 'Requerimiento y Análisis' a partir del Contract A."""
+    if contract_a is None:
+        return '<p style="font-size:10pt;color:#6e7781;font-style:italic;">Información del requerimiento original no disponible.</p>'
+
+    # 4.1 Requerimiento original
+    s41 = f"""
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11pt;font-weight:600;color:#1f2328;margin-bottom:8px;">4.1 Requerimiento Original</div>
+      <div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:14px 18px;
+                  font-family:monospace;font-size:9.5pt;white-space:pre-wrap;color:#1f2328;line-height:1.6;">
+{_e(contract_a.original_requirements_text)}
+      </div>
+    </div>
+"""
+
+    # 4.2 Ambigüedades resueltas
+    all_ambiguities = [
+        (story, ambi)
+        for story in contract_a.user_stories
+        for ambi in story.ambiguities_resolved
+    ]
+
+    if all_ambiguities:
+        ambi_rows = ""
+        for story, ambi in all_ambiguities:
+            badge = (
+                '<span style="background:#8250df;color:#fff;font-size:7.5pt;font-weight:700;'
+                'padding:2px 8px;border-radius:10px;margin-left:8px;">Asumido por LLM</span>'
+                if ambi.assumption_made else
+                '<span style="background:#0550ae;color:#fff;font-size:7.5pt;font-weight:700;'
+                'padding:2px 8px;border-radius:10px;margin-left:8px;">Resuelto por analista</span>'
+            )
+            ambi_rows += f"""
+        <tr>
+          <td style="font-size:9pt;color:#6e7781;white-space:nowrap;">{_e(story.id)}</td>
+          <td style="font-size:9pt;">{_e(ambi.original_text)}</td>
+          <td style="font-size:9pt;">{_e(ambi.resolution)}{badge}</td>
+        </tr>
+"""
+        s42 = f"""
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11pt;font-weight:600;color:#1f2328;margin-bottom:8px;">4.2 Ambigüedades Resueltas</div>
+      <table class="iso-table">
+        <thead>
+          <tr>
+            <th>Historia</th>
+            <th>Texto ambiguo detectado</th>
+            <th>Resolución aplicada</th>
+          </tr>
+        </thead>
+        <tbody>{ambi_rows}</tbody>
+      </table>
+    </div>
+"""
+    else:
+        s42 = """
+    <div style="margin-bottom:24px;">
+      <div style="font-size:11pt;font-weight:600;color:#1f2328;margin-bottom:8px;">4.2 Ambigüedades Resueltas</div>
+      <p style="font-size:10pt;color:#6e7781;font-style:italic;">No se detectaron ambigüedades en este requerimiento.</p>
+    </div>
+"""
+
+    # 4.3 Historias de usuario con criterios de aceptación
+    _priority_colors = {"critical": "#cf222e", "high": "#bc4c00", "medium": "#9a6700", "low": "#1a7f37"}
+    us_html = ""
+    for story in contract_a.user_stories:
+        priority_val = getattr(story.priority, "value", str(story.priority))
+        priority_color = _priority_colors.get(priority_val.lower(), "#6e7781")
+
+        ac_items = ""
+        for ac in story.acceptance_criteria:
+            neg_badge = (
+                '<span style="background:#cf222e;color:#fff;font-size:7.5pt;font-weight:700;'
+                'padding:2px 8px;border-radius:10px;margin-left:6px;">Caso negativo</span>'
+                if ac.is_negative_case else ""
+            )
+            ac_items += f"""
+          <div style="background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:12px 14px;margin-bottom:8px;">
+            <div style="font-size:10pt;font-weight:600;color:#1f2328;margin-bottom:8px;">
+              {_e(ac.id)}{neg_badge}
+              <span style="font-weight:400;color:#444d56;margin-left:8px;">{_e(ac.description)}</span>
+            </div>
+            <div style="display:grid;gap:6px;font-size:9.5pt;">
+              <div style="padding:6px 10px;background:#ddf4ff;border-left:3px solid #0550ae;border-radius:0 4px 4px 0;">
+                <strong style="color:#0550ae;">Dado que</strong> {_e(ac.given)}
+              </div>
+              <div style="padding:6px 10px;background:#fff8c5;border-left:3px solid #9a6700;border-radius:0 4px 4px 0;">
+                <strong style="color:#9a6700;">Cuando</strong> {_e(ac.when)}
+              </div>
+              <div style="padding:6px 10px;background:#dafbe1;border-left:3px solid #1a7f37;border-radius:0 4px 4px 0;">
+                <strong style="color:#1a7f37;">Entonces</strong> {_e(ac.then)}
+              </div>
+            </div>
+          </div>
+"""
+        us_html += f"""
+      <div style="border:1px solid #d0d7de;border-radius:6px;padding:16px 18px;margin-bottom:16px;">
+        <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:12px;">
+          <span style="background:#0550ae;color:#fff;font-size:9pt;font-weight:700;
+                       padding:3px 10px;border-radius:12px;white-space:nowrap;">{_e(story.id)}</span>
+          <div style="flex:1;">
+            <div style="font-size:11pt;font-weight:700;color:#1f2328;">{_e(story.title)}</div>
+            <div style="font-size:9pt;color:#6e7781;margin-top:3px;">
+              Como <strong>{_e(story.as_a)}</strong>,
+              quiero <strong>{_e(story.i_want)}</strong>,
+              para que <strong>{_e(story.so_that)}</strong>
+            </div>
+          </div>
+          <span style="background:{priority_color};color:#fff;font-size:8pt;font-weight:700;
+                       padding:2px 10px;border-radius:10px;white-space:nowrap;">{_e(priority_val.upper())}</span>
+        </div>
+        {ac_items}
+      </div>
+"""
+
+    s43 = f"""
+    <div>
+      <div style="font-size:11pt;font-weight:600;color:#1f2328;margin-bottom:12px;">
+        4.3 Historias de Usuario y Criterios de Aceptación
+      </div>
+      {us_html}
+    </div>
+"""
+
+    return f"""
+    <p style="font-size:10pt;color:#444d56;margin-bottom:16px;">
+      Esta sección documenta el requerimiento original del cliente, las ambigüedades detectadas
+      y resueltas durante el refinamiento (M1), y las historias de usuario con sus criterios de
+      aceptación en formato Gherkin que sirvieron como base para la generación de los casos de prueba.
+    </p>
+    {s41}{s42}{s43}
+"""
+
+
+# ============================================================
 # CONSTRUCCIÓN DEL ACTA
 # ============================================================
-def generar_acta_html(suite: GherkinTestSuite, original_path: Path) -> str:
+def generar_acta_html(suite: GherkinTestSuite, original_path: Path, contract_a=None) -> str:
     rev = suite.review
     status_label, status_color = _STATUS_LABELS.get(
         rev.review_status, ("DESCONOCIDO", "#6e7781")
@@ -896,6 +1035,9 @@ def generar_acta_html(suite: GherkinTestSuite, original_path: Path) -> str:
     </div>
 """
 
+    # ---- S4 (nueva): REQUERIMIENTO Y ANÁLISIS ----
+    s4_req_body = _section_req_analisis(contract_a)
+
     # ---- ENSAMBLE ----
     return f"""<!DOCTYPE html>
 <html lang="es">
@@ -911,12 +1053,13 @@ def generar_acta_html(suite: GherkinTestSuite, original_path: Path) -> str:
     {_section(1, "Identificación del Documento", s1_body)}
     {_section(2, "Responsable de Revisión y Decisión Tomada", s2_body)}
     {_section(3, "Resumen Ejecutivo y Contexto de Requerimientos", s3_body)}
-    {_section(4, "Cobertura de Aspectos de Calidad", s4_body)}
-    {_section(5, "Análisis de Riesgos por Aspecto de Calidad", s5_riesgos_body)}
-    {_section(6, "Catálogo de Casos de Prueba", inventario_html)}
-    {_section(7, "Trazabilidad: Requisitos y Casos de Prueba", s6_body)}
-    {_section(8, "Historial de Revisión y Auditoría", s7_body)}
-    {_section(9, "Firmas", s8_body)}
+    {_section(4, "Requerimiento y Análisis", s4_req_body)}
+    {_section(5, "Cobertura de Aspectos de Calidad", s4_body)}
+    {_section(6, "Análisis de Riesgos por Aspecto de Calidad", s5_riesgos_body)}
+    {_section(7, "Catálogo de Casos de Prueba", inventario_html)}
+    {_section(8, "Trazabilidad: Requisitos y Casos de Prueba", s6_body)}
+    {_section(9, "Historial de Revisión y Auditoría", s7_body)}
+    {_section(10, "Firmas", s8_body)}
     {footer}
   </div>
 </body>
@@ -927,7 +1070,7 @@ def generar_acta_html(suite: GherkinTestSuite, original_path: Path) -> str:
 # ============================================================
 # PERSISTENCIA
 # ============================================================
-def guardar_acta(suite: GherkinTestSuite, original_path: Path) -> Path:
+def guardar_acta(suite: GherkinTestSuite, original_path: Path, contract_a=None) -> Path:
     """Guarda el acta HTML junto al JSON revisado, con sufijo _acta.html."""
     stem = original_path.stem
     if stem.endswith("_reviewed"):
@@ -935,7 +1078,7 @@ def guardar_acta(suite: GherkinTestSuite, original_path: Path) -> Path:
     else:
         base = stem
     output_path = original_path.with_name(f"{base}_acta.html")
-    html_content = generar_acta_html(suite, original_path)
+    html_content = generar_acta_html(suite, original_path, contract_a)
     output_path.write_text(html_content, encoding="utf-8")
     return output_path
 

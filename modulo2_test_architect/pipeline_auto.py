@@ -21,6 +21,7 @@ Flujo:
 import argparse
 import json
 import os
+import re
 import sys
 import uuid
 import warnings
@@ -317,7 +318,7 @@ def construir_prompt(ac: AcceptanceCriterion, story: UserStory, patrones: list[d
 # ============================================================
 def generar_con_groq(client: Groq, system_prompt: str, user_message: str) -> str:
     response = client.chat.completions.create(
-        model="qwen/qwen3-32b",
+        model=os.environ.get("GROQ_MODEL", "qwen/qwen3-32b"),
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_message},
@@ -333,7 +334,8 @@ def generar_con_groq(client: Groq, system_prompt: str, user_message: str) -> str
 # GENERACIÓN — PASO 6: Parsear respuesta del LLM
 # ============================================================
 def parsear_a_escenarios(raw_text: str, ac: AcceptanceCriterion, story: UserStory) -> list[GherkinScenario]:
-    text = raw_text.strip()
+    # Eliminar bloques <think>…</think> que emiten modelos de razonamiento (qwen3, deepseek-r1, etc.)
+    text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
     if "```json" in text:
         text = text.split("```json", 1)[1].rsplit("```", 1)[0]
     elif "```" in text:

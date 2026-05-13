@@ -29,6 +29,7 @@ Ejecutar:
 
 import json
 import os
+import re
 import sys
 import uuid
 import warnings
@@ -119,7 +120,7 @@ class RequirementsRefinerAgent:
     def __init__(
         self,
         groq_api_key: str,
-        model_name: str = "qwen/qwen3-32b",
+        model_name: str = None,
         embedding_model: str = "all-MiniLM-L6-v2",
         kb_path: str = None,
         stories_path: str = None,
@@ -127,7 +128,7 @@ class RequirementsRefinerAgent:
         temperature: float = 0.3,
     ):
         self.groq_client = Groq(api_key=groq_api_key)
-        self.model_name = model_name
+        self.model_name = model_name or os.environ.get("GROQ_MODEL", "qwen/qwen3-32b")
         self.max_retries = max_retries
         self.temperature = temperature
 
@@ -376,7 +377,8 @@ class RequirementsRefinerAgent:
     # ----------------------------------------------------------
     def _extract_json(self, raw_response: str) -> dict:
         """Extrae JSON de la respuesta del LLM, limpiando texto extra."""
-        text = raw_response.strip()
+        # Eliminar bloques <think>…</think> de modelos de razonamiento (qwen3, deepseek-r1, etc.)
+        text = re.sub(r"<think>.*?</think>", "", raw_response, flags=re.DOTALL).strip()
 
         # Remover bloques de markdown si el LLM los incluye
         if "```json" in text:

@@ -88,14 +88,10 @@ function CompletedView({ result, onBack }) {
   }
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.rejected
 
-  function downloadActa() {
+  function verActa() {
     const blob = new Blob([acta_html], { type: 'text/html;charset=utf-8' })
     const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `acta_aprobacion_${new Date().toISOString().slice(0, 10)}.html`
-    a.click()
-    URL.revokeObjectURL(url)
+    window.open(url, '_blank')
   }
 
   return (
@@ -117,11 +113,11 @@ function CompletedView({ result, onBack }) {
             El acta está lista. Descárgala y ábrela en el navegador para imprimirla como PDF (Ctrl+P).
           </p>
           <button
-            onClick={downloadActa}
+            onClick={verActa}
             className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold text-sm hover:bg-emerald-700 transition flex items-center justify-center gap-2"
           >
-            <span>⬇</span>
-            <span>Descargar Acta HTML</span>
+            <span>↗</span>
+            <span>Ver Acta HTML</span>
           </button>
         </div>
       )}

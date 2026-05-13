@@ -12,6 +12,7 @@ _ENV_FILE = str(_local_env) if _local_env.exists() else str(_agent_env)
 
 class Settings(BaseSettings):
     groq_api_key: str
+    groq_model: str = "qwen/qwen3-32b"
     max_concurrent_jobs: int = 3
     agent_module_path: str = str(_AGENT_DIR)
 

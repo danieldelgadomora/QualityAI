@@ -1,5 +1,5 @@
 BE-AI/venv
-BE-AI/.env
+#BE-AI/.env
 FE-IA/node_modules
-modulo1_requirements_refiner/.env
-modulo2_test_architect/.env
+#modulo1_requirements_refiner/.env
+#modulo2_test_architect/.env

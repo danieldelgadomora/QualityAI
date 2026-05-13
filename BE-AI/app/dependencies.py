@@ -10,6 +10,7 @@ from app.config import settings
 # agente_v3_ambiguity.py tiene un check a nivel de módulo que llama sys.exit(1)
 # si la variable no está disponible en el momento del import.
 os.environ.setdefault("GROQ_API_KEY", settings.groq_api_key)
+os.environ.setdefault("GROQ_MODEL", settings.groq_model)
 
 if settings.agent_module_path not in sys.path:
     sys.path.insert(0, settings.agent_module_path)
@@ -37,7 +38,7 @@ def init_agent() -> None:
     _agent_v2 = _AgentV2(groq_api_key=settings.groq_api_key)
     print("✅ Agente v2 listo")
     print("⏳ Inicializando agente v4 (HITL)...")
-    _agent_v4 = _AgentV4(groq_api_key=settings.groq_api_key)
+    _agent_v4 = _AgentV4(groq_api_key=settings.groq_api_key, model_name=settings.groq_model)
     print("✅ Agente v4 listo")
     _executor = ThreadPoolExecutor(max_workers=settings.max_concurrent_jobs)
 

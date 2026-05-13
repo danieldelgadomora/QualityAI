@@ -166,20 +166,24 @@ class PipelineOrchestrator:
                     functools.partial(buscar_patrones_similares, modelo, collection, ac, 3),
                 )
                 sys_prompt, usr_msg = construir_prompt(ac, story, patrones)
-                raw = await loop.run_in_executor(
-                    executor,
-                    functools.partial(generar_con_groq, groq_client, sys_prompt, usr_msg),
-                )
-
+                generated = 0
                 try:
+                    raw = await loop.run_in_executor(
+                        executor,
+                        functools.partial(generar_con_groq, groq_client, sys_prompt, usr_msg),
+                    )
                     escenarios = await loop.run_in_executor(
                         executor,
                         functools.partial(parsear_a_escenarios, raw, ac, story),
                     )
                     scenarios_por_story[story.id].extend(escenarios)
                     generated = len(escenarios)
-                except Exception:
-                    generated = 0
+                except Exception as exc:
+                    await self._send({
+                        "type": "status_update",
+                        "message": f"Aviso: no se generaron escenarios para {ac.id} ({exc})",
+                        "phase": "m2_gen",
+                    })
 
                 done_acs += 1
                 await self._send({
@@ -190,6 +194,13 @@ class PipelineOrchestrator:
                     "total_acs": total_acs,
                     "done_acs": done_acs,
                 })
+
+        total_generated = sum(len(v) for v in scenarios_por_story.values())
+        if total_generated == 0:
+            raise RuntimeError(
+                "El LLM no generó ningún escenario válido. "
+                "Verifica la conectividad con Groq y que el modelo responda en formato JSON."
+            )
 
         suite = await loop.run_in_executor(
             executor,
@@ -287,7 +298,7 @@ class PipelineOrchestrator:
             })
             acta_path = await loop.run_in_executor(
                 executor,
-                functools.partial(guardar_acta, suite, contract_b_path),
+                functools.partial(guardar_acta, suite, contract_b_path, contract_a),
             )
             acta_html = acta_path.read_text(encoding="utf-8")
 
