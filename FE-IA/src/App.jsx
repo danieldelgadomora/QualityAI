@@ -14,6 +14,8 @@ export default function App() {
 
   function reset() {
     setPhase('form')
+    setRequirement('')
+    setTopK(3)
   }
 
   return (
